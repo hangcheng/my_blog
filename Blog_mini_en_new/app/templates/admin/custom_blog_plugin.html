@@ -1,0 +1,110 @@
+{% extends 'admin/admin_base.html' %}
+{% import "_macros.html" as macros %}
+
+{% block title %}
+    Daniel Microblog-Plug-in Management
+{% endblock %}
+
+{% block admin_content %}
+<div class="entry-box custom-blog-plugin">
+    <h4><strong>Plug-in Management</strong></h4>
+    <hr/>
+    <p><span class="glyphicon glyphicon-wrench"></span>Total number of plug-ins：<span class="badge">{{ Plugin.query.count() }}</span></p>
+    <div class="blog-plugin-box">
+        <div class="blog-plugin" id="blogPlugin">
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr class="table-header">
+                    <th>Serial number</th>
+                    <th>Plug-in name</th>
+                    <th>Remarks</th>
+                    <th>Sort</th>
+                    <th>start using</th>
+                    <th>modify</th>
+                    <th>delete</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for plugin in plugins %}
+                    <tr>
+                        <td>{{ plugin.order }}</td>
+                        <td>{{ plugin.title }}</td>
+                        <td>{{ plugin.note }}</td>
+                        <td>
+                            <a class="btn sort-up" title="ascend"
+                               href="{{ url_for('admin.plugin_sort_up', id=plugin.id, page=page) }}">
+                                <span class="glyphicon glyphicon-circle-arrow-up"></span>
+                            </a>
+                            <a class="btn sort-down" title="descend"
+                               href="{{ url_for('admin.plugin_sort_down', id=plugin.id, page=page) }}">
+                                <span class="glyphicon glyphicon-circle-arrow-down"></span>
+                            </a>
+                        </td>
+                        <td>
+                            {% if plugin.disabled == True %}
+                                <a class="btn btn-sm btn-warning comment-handle-admin enabled-blog-plugin-btn"
+                                   title="Enable plug-ins"
+                                   href="{{ url_for('admin.enable_plugin', id=plugin.id, page=page) }}">
+                                    <span class="glyphicon glyphicon-remove-sign"></span>
+                                </a>
+                            {% else %}
+                                <a class="btn btn-sm btn-success comment-handle-admin disabled-blog-plugin-btn"
+                                   title="Disable plug-ins"
+                                   href="{{ url_for('admin.disable_plugin', id=plugin.id, page=page) }}">
+                                    <span class="glyphicon glyphicon-ok-sign"></span>
+                                </a>
+                            {% endif %}
+                        </td>
+                        {% if plugin.content != 'system_plugin' %}
+                            <td>
+                                <a class="btn" title="Modify plug-in information"
+                                   href="{{ url_for('admin.edit_plugin', id=plugin.id, page=page) }}">
+                                    <span class="glyphicon glyphicon-edit"></span>
+                                </a>
+                            </td>
+                            <td>
+                                <a class="btn btn-sm btn-default delete-blog-plugin" title="Delete plug-ins"
+                                   onclick="delPluginCfm('{{ url_for('admin.delete_plugin', id=plugin.id, page=page) }}')">
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                </a>
+                            </td>
+                        {% else %}
+                            <td></td>
+                            <td></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="pagination">
+        {{ macros.pagination_widget(pagination, endpoint) }}
+    </div>
+</div>
+
+<!-- 信息删除确认: For delete a plugin confirm -->
+<div class="modal fade" id="delPluginCfmModal">
+    <div class="modal-dialog">
+        <div class="modal-content message_align">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Confirm deletion of plug-ins?</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    The navigation cannot be restored after deletion. Are you sure you want to delete it?
+                </p>
+                <p>
+                    （Tip: If you just don't want to display the plug-in, you can disable it without deleting it.）
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">cancel</button>
+                <a onclick="" id="delPluginCfmClick" class="btn btn-success" data-dismiss="modal">confirm</a>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+{% endblock %}
